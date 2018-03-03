@@ -6,6 +6,7 @@ window.Settings = {
   radius: 350,
   strutFactor: 0.25,
   strutTarget: 3,
+  subStrutTarget: 3,
   numSides: 5,
 };
 
@@ -95,7 +96,8 @@ class Branch {
   calcStrutPoints() {
     var strutPoints = [];
     for (var i = 0; i < this.midPoints.length; i++) {
-      var iNext = (i + Settings.strutTarget) % this.outerPoints.length;
+      var skipNum = (this.num == 0) ? Settings.strutTarget : Settings.subStrutTarget;
+      var iNext = (i + skipNum) % this.outerPoints.length;
       strutPoints[i] = this.calcStrutPoint(this.midPoints[i], this.outerPoints[iNext]);
     }
     return strutPoints;

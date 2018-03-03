@@ -41,6 +41,13 @@ $(function () {
     Settings.strutTarget = $(this).data('slider').getValue();
   });
 
+  $('#js_subStrutTarget').slider({
+    min: 1, max: 10, step: 1,
+    value: Settings.subStrutTarget
+  }).on('slideStop', function () {
+    Settings.subStrutTarget = $(this).data('slider').getValue();
+  });
+
   $('#js_numSides').slider({
     min: 1, max: 10, step: 1,
     value: Settings.numSides
