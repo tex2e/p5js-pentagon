@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Sutcliffe Pentagons</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-colorpicker.min.css">
+    <link rel="stylesheet" href="css/bootstrap-slider.min.css">
+    <script src="js/lib/p5.min.js"></script>
+    <script src="js/lib/jquery-3.3.1.min.js"></script>
+    <script src="js/lib/bootstrap.min.js"></script>
+    <script src="js/lib/bootstrap-colorpicker.min.js"></script>
+    <script src="js/lib/bootstrap-slider.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/settings.js"></script>
+  </head>
+  <body>
+    <a href="https://github.com/tex2e/p5js-pentagon" class="fork-me-on-github">
+      <img style="position: absolute; top: 0; right: 0; border: 0;"
+        src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
+        alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+    </a>
+
+    <form class="settings">
+      <h3>Drawing Settings</h3>
+
+      <div class="form-group">
+        <label for="js_branch_color">Color</label>
+        <div id="js_branch_color" class="input-group colorpicker-component">
+          <input class="form-control" type="text" value="#00AABB" class="form-control" />
+          <span class="input-group-addon"><i></i></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="js_nest">Nest</label><br>
+        <input class="form-control" id="js_nest" type="text"/>
+      </div>
+      <div class="form-group">
+        <label for="js_radius">Radius</label><br>
+        <input class="form-control" id="js_radius" type="text"/>
+      </div>
+      <div class="form-group">
+        <label for="js_strutFactor">Strut Factor</label><br>
+        <input class="form-control" id="js_strutFactor" type="text"/>
+      </div>
+      <div class="form-group">
+        <label for="js_strutTarget">Strut Target</label><br>
+        <input class="form-control" id="js_strutTarget" type="text"/>
+      </div>
+      <div class="form-group">
+        <label for="js_numSides">Side Number</label><br>
+        <input class="form-control" id="js_numSides" type="text"/>
+      </div>
+
+      <button class="btn btn-primary" type="button" name="button" onclick="save('my-fractal.png');">
+        <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+        Save
+      </button>
+      <button class="btn btn-success" type="button" name="button" onclick="drawFractal();">
+        <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span>
+        Redraw
+      </button>
+    </form>
+
+    <h1>Sutcliffe Pentagons</h1>
+  </body>
+</html>
