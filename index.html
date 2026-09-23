@@ -1,74 +1,122 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Sutcliffe Pentagons</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#efeee9">
+    <meta name="description" content="Create and save intricate geometric patterns with Sutcliffe Pentagons.">
+    <title>Sutcliffe Pentagons — Generative Art</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <link rel="alternate icon" href="./favicon.ico" sizes="any">
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/bootstrap-colorpicker.min.css">
-    <link rel="stylesheet" href="css/bootstrap-slider.min.css">
-    <script src="js/lib/p5.min.js"></script>
-    <script src="js/lib/jquery-3.3.1.min.js"></script>
-    <script src="js/lib/bootstrap.min.js"></script>
-    <script src="js/lib/bootstrap-colorpicker.min.js"></script>
-    <script src="js/lib/bootstrap-slider.min.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/settings.js"></script>
+    <script src="js/lib/p5.min.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/settings.js" defer></script>
   </head>
   <body>
-    <a href="https://github.com/tex2e/p5js-pentagon" class="fork-me-on-github">
-      <img style="position: absolute; top: 0; right: 0; border: 0;"
-        src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
-        alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
-    </a>
+    <div class="app-shell">
+      <aside class="control-panel" aria-label="Artwork settings">
+        <a class="brand" href="./" aria-label="Sutcliffe Pentagons home">
+          <span class="brand-mark" aria-hidden="true">◇</span>
+          <span class="brand-copy">
+            <span class="brand-name">Sutcliffe</span>
+            <span class="brand-caption">PENTAGON STUDIO</span>
+          </span>
+        </a>
 
-    <form class="settings">
-      <h3>Drawing Settings</h3>
-
-      <div class="form-group">
-        <label for="js_branch_color">Color</label>
-        <div id="js_branch_color" class="input-group colorpicker-component">
-          <input class="form-control" type="text" value="#00AABB" class="form-control" />
-          <span class="input-group-addon"><i></i></span>
+        <div class="panel-heading">
+          <p class="eyebrow">MAKE SOMETHING INTRICATE</p>
+          <h1>Find your pattern.</h1>
+          <p class="panel-intro">Adjust the geometry and watch it take shape.</p>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="js_nest">Nest</label><br>
-        <input class="form-control" id="js_nest" type="text"/>
-      </div>
-      <div class="form-group">
-        <label for="js_radius">Radius</label><br>
-        <input class="form-control" id="js_radius" type="text"/>
-      </div>
-      <div class="form-group">
-        <label for="js_strutFactor">Strut Factor</label><br>
-        <input class="form-control" id="js_strutFactor" type="text"/>
-      </div>
-      <div class="form-group">
-        <label for="js_strutTarget">Strut Target</label><br>
-        <input class="form-control" id="js_strutTarget" type="text"/>
-      </div>
-      <div class="form-group">
-        <label for="js_subStrutTarget">Sub Strut Target</label><br>
-        <input class="form-control" id="js_subStrutTarget" type="text"/>
-      </div>
-      <div class="form-group">
-        <label for="js_numSides">Side Number</label><br>
-        <input class="form-control" id="js_numSides" type="text"/>
-      </div>
+        <section class="palette-section" aria-labelledby="palette-heading">
+          <h2 id="palette-heading" class="section-label">Palette</h2>
+          <div class="palette-list" role="group" aria-label="Choose a color palette">
+            <button class="palette-option is-selected" type="button" data-palette="paper" aria-pressed="true">
+              <span class="palette-swatch palette-swatch-paper" aria-hidden="true"></span>
+              <span>Paper</span>
+            </button>
+            <button class="palette-option" type="button" data-palette="night" aria-pressed="false">
+              <span class="palette-swatch palette-swatch-night" aria-hidden="true"></span>
+              <span>Night</span>
+            </button>
+            <button class="palette-option" type="button" data-palette="copper" aria-pressed="false">
+              <span class="palette-swatch palette-swatch-copper" aria-hidden="true"></span>
+              <span>Copper</span>
+            </button>
+          </div>
+        </section>
 
-      <button class="btn btn-primary" type="button" name="button" onclick="save('my-fractal.png');">
-        <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
-        Save
-      </button>
-      <button class="btn btn-success" type="button" name="button" onclick="drawFractal();">
-        <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span>
-        Redraw
-      </button>
-    </form>
+        <section class="controls-section" aria-labelledby="controls-heading">
+          <h2 id="controls-heading" class="section-label">Geometry</h2>
 
-    <h1>Sutcliffe Pentagons</h1>
+          <label class="range-control" for="js_nest">
+            <span class="range-heading"><span>Layers</span><output for="js_nest" data-value-for="js_nest">4</output></span>
+            <input id="js_nest" type="range" min="2" max="6" step="1" value="4">
+          </label>
+
+          <label class="range-control" for="js_radius">
+            <span class="range-heading"><span>Size</span><output for="js_radius" data-value-for="js_radius">335</output></span>
+            <input id="js_radius" type="range" min="160" max="360" step="5" value="335">
+          </label>
+
+          <label class="range-control" for="js_lineWeight">
+            <span class="range-heading"><span>Line weight</span><output for="js_lineWeight" data-value-for="js_lineWeight">2.2</output></span>
+            <input id="js_lineWeight" type="range" min="0.8" max="3.5" step="0.1" value="2.2">
+          </label>
+
+          <label class="range-control" for="js_strutFactor">
+            <span class="range-heading"><span>Form</span><output for="js_strutFactor" data-value-for="js_strutFactor">0.25</output></span>
+            <input id="js_strutFactor" type="range" min="-0.5" max="0.5" step="0.01" value="0.25">
+          </label>
+
+          <label class="range-control" for="js_strutTarget">
+            <span class="range-heading"><span>Primary connection</span><output for="js_strutTarget" data-value-for="js_strutTarget">3</output></span>
+            <input id="js_strutTarget" type="range" min="1" max="9" step="1" value="3">
+          </label>
+
+          <label class="range-control" for="js_subStrutTarget">
+            <span class="range-heading"><span>Inner connection</span><output for="js_subStrutTarget" data-value-for="js_subStrutTarget">3</output></span>
+            <input id="js_subStrutTarget" type="range" min="1" max="9" step="1" value="3">
+          </label>
+
+          <label class="range-control" for="js_numSides">
+            <span class="range-heading"><span>Sides</span><output for="js_numSides" data-value-for="js_numSides">5</output></span>
+            <input id="js_numSides" type="range" min="3" max="10" step="1" value="5">
+          </label>
+        </section>
+
+        <div class="panel-actions">
+          <button class="save-button" id="save-artwork" type="button">
+            <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M10 2.5v9m0 0 3.5-3.5M10 11.5 6.5 8M3.5 14v3h13v-3" /></svg>
+            Save artwork
+          </button>
+          <p class="save-note">Saved as a high-resolution PNG</p>
+        </div>
+
+        <a class="github-link" href="https://github.com/tex2e/p5js-pentagon" target="_blank" rel="noreferrer">
+          <span>View the project on GitHub</span><span aria-hidden="true">↗</span>
+        </a>
+      </aside>
+
+      <main class="artwork-stage">
+        <header class="stage-header">
+          <div>
+            <p class="eyebrow">GENERATIVE STUDY Nº 01</p>
+            <p class="stage-title">A geometry in motion</p>
+          </div>
+          <span class="live-indicator"><span aria-hidden="true"></span> LIVE PREVIEW</span>
+        </header>
+        <div class="stage-content">
+          <div class="artwork-frame" id="artwork" aria-label="Generative pentagon artwork"></div>
+        </div>
+        <footer class="stage-footer">
+          <span>SUTCLIFFE PENTAGONS</span>
+          <span>AN EXPLORATION OF REPEATED FORM</span>
+        </footer>
+      </main>
+    </div>
   </body>
 </html>

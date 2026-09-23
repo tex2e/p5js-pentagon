@@ -1,14 +1,18 @@
 'use strict';
 
 window.Settings = {
-  branchColor: '#000000',
-  nest: 5,
-  radius: 350,
+  branchColor: '#30343B',
+  backgroundColor: '#F4F1EA',
+  nest: 4,
+  radius: 335,
+  lineWeight: 2.2,
   strutFactor: 0.25,
   strutTarget: 3,
   subStrutTarget: 3,
   numSides: 5,
 };
+
+let branchStyles = [];
 
 class Point {
   constructor(x, y) {
@@ -19,19 +23,19 @@ class Point {
 
 class FractalRoot {
   constructor() {
-    this.points = [];
-    var centerX = width / 2;
-    var centerY = height / 2;
-    var angleStep = 360 / Settings.numSides;
-    var count = 0;
-    for (var i = -90; i < 270; i += angleStep) {
-      this.points[count] = new Point(
-        centerX + (Settings.radius * cos(radians(i))),
-        centerY + (Settings.radius * sin(radians(i))),
-      )
-      count++;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const angleStep = 360 / Settings.numSides;
+    const points = [];
+
+    for (let i = -90; i < 270; i += angleStep) {
+      points.push(new Point(
+        centerX + Settings.radius * cos(radians(i)),
+        centerY + Settings.radius * sin(radians(i)),
+      ));
     }
-    this.rootBranch = new Branch(0, 0, this.points);
+
+    this.rootBranch = new Branch(0, 0, points);
   }
 
   drawShape() {
@@ -45,91 +49,83 @@ class Branch {
     this.num = num;
     this.outerPoints = points;
     this.midPoints = this.calcMidPoints();
-    this.strutFactor = Settings.strutFactor;
     this.projPoints = this.calcStrutPoints();
-    this.maxLevel = Settings.nest;
+    this.children = [];
 
-    if (level + 1 < this.maxLevel) {
-      var childBranch = new Branch(level + 1, 0, this.projPoints);
-      childBranch.draw();
-      //
-      for (var k = 0; k < this.outerPoints.length; k++) {
-        var kNext = (k - 1 + this.outerPoints.length) % this.outerPoints.length;
-        var newPoints = [
+    if (level + 1 < Settings.nest) {
+      this.children.push(new Branch(level + 1, 0, this.projPoints));
+
+      for (let k = 0; k < this.outerPoints.length; k++) {
+        const kNext = (k - 1 + this.outerPoints.length) % this.outerPoints.length;
+        const newPoints = [
           this.projPoints[k], this.midPoints[k], this.outerPoints[k],
           this.midPoints[kNext], this.projPoints[kNext],
         ];
-        var subChildBranch = new Branch(level + 1, k + 1, newPoints);
-        subChildBranch.draw();
+        this.children.push(new Branch(level + 1, k + 1, newPoints));
       }
     }
   }
 
   draw() {
-    var weight = (this.level < 5) ? 5 - this.level : 0.5;
-    strokeWeight(weight);
-    // draw outer shape
-    for (var i = 0; i < this.outerPoints.length; i++) {
-      var iNext = (i + 1) % this.outerPoints.length;
-      line(this.outerPoints[i].x, this.outerPoints[i].y,
-           this.outerPoints[iNext].x, this.outerPoints[iNext].y);
+    // Draw the inner structure first so each larger outline stays distinct.
+    this.children.forEach((child) => child.draw());
+
+    const style = branchStyles[this.level];
+    stroke(style.color);
+    strokeWeight(style.weight);
+
+    for (let i = 0; i < this.outerPoints.length; i++) {
+      const next = (i + 1) % this.outerPoints.length;
+      line(
+        this.outerPoints[i].x, this.outerPoints[i].y,
+        this.outerPoints[next].x, this.outerPoints[next].y,
+      );
     }
   }
 
   calcMidPoints() {
-    var midPoints = [];
-    for (var i = 0; i < this.outerPoints.length; i++) {
-      var iNext = (i + 1) % this.outerPoints.length;
-      midPoints[i] = this.calcMidPoint(this.outerPoints[i], this.outerPoints[iNext]);
-    }
-    return midPoints;
-  }
-
-  calcMidPoint(end1, end2) {
-    var mx = (end1.x > end2.x) ? end2.x + ((end1.x - end2.x) / 2)
-                               : end1.x + ((end2.x - end1.x) / 2);
-    var my = (end1.y > end2.y) ? end2.y + ((end1.y - end2.y) / 2)
-                               : end1.y + ((end2.y - end1.y) / 2);
-    return new Point(mx, my);
+    return this.outerPoints.map((point, index) => {
+      const next = this.outerPoints[(index + 1) % this.outerPoints.length];
+      return new Point((point.x + next.x) / 2, (point.y + next.y) / 2);
+    });
   }
 
   calcStrutPoints() {
-    var strutPoints = [];
-    for (var i = 0; i < this.midPoints.length; i++) {
-      var skipNum = (this.num == 0) ? Settings.strutTarget : Settings.subStrutTarget;
-      var iNext = (i + skipNum) % this.outerPoints.length;
-      strutPoints[i] = this.calcStrutPoint(this.midPoints[i], this.outerPoints[iNext]);
-    }
-    return strutPoints;
-  }
-
-  calcStrutPoint(mp, op) {
-    var opp = abs(op.x - mp.x);
-    var adj = abs(op.y - mp.y);
-    var px  = (op.x > mp.x) ? mp.x + (opp * this.strutFactor)
-                            : mp.x - (opp * this.strutFactor);
-    var py  = (op.y > mp.y) ? mp.y + (adj * this.strutFactor)
-                            : mp.y - (adj * this.strutFactor);
-    return new Point(px, py);
+    return this.midPoints.map((midPoint, index) => {
+      const skip = this.num === 0 ? Settings.strutTarget : Settings.subStrutTarget;
+      const target = this.outerPoints[(index + skip) % this.outerPoints.length];
+      return new Point(
+        midPoint.x + (target.x - midPoint.x) * Settings.strutFactor,
+        midPoint.y + (target.y - midPoint.y) * Settings.strutFactor,
+      );
+    });
   }
 }
 
 function setup() {
-  createCanvas(800, 800);
+  pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
+  const canvas = createCanvas(800, 800);
+  canvas.parent('artwork');
+  canvas.elt.setAttribute('role', 'img');
+  canvas.elt.setAttribute('aria-label', 'A geometric pattern formed by nested pentagons');
+  noLoop();
   drawFractal();
 }
 
 function drawFractal() {
-  clear();
-  stroke(Settings.branchColor);
-  background('rgba(255,255,255,0)');
-  var fractalRoot = new FractalRoot();
-  fractalRoot.drawShape();
+  background(Settings.backgroundColor);
+  const ink = color(Settings.branchColor);
+  const paper = color(Settings.backgroundColor);
+  branchStyles = Array.from({ length: Settings.nest }, (_, level) => {
+    const progress = level / Math.max(1, Settings.nest - 1);
+    return {
+      color: lerpColor(ink, paper, progress * 0.58),
+      weight: Math.max(0.3, Settings.lineWeight * Math.pow(0.73, level)),
+    };
+  });
+  new FractalRoot().drawShape();
 }
 
-function mouseClicked() {
-  if (0 <= mouseX && mouseX < width &&
-      0 <= mouseY && mouseY < height) {
-    drawFractal();
-  }
+function saveArtwork() {
+  saveCanvas('sutcliffe-pentagons', 'png');
 }

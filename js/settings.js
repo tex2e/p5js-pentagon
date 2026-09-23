@@ -1,58 +1,67 @@
+'use strict';
 
-// Config drawing settings
+window.addEventListener('DOMContentLoaded', () => {
+  const palettes = {
+    paper: { background: '#F4F1EA', ink: '#30343B' },
+    night: { background: '#101820', ink: '#8CB9B5' },
+    copper: { background: '#191715', ink: '#C49A73' },
+  };
 
-$(function () {
+  const settingNames = {
+    js_nest: 'nest',
+    js_radius: 'radius',
+    js_lineWeight: 'lineWeight',
+    js_strutFactor: 'strutFactor',
+    js_strutTarget: 'strutTarget',
+    js_subStrutTarget: 'subStrutTarget',
+    js_numSides: 'numSides',
+  };
 
-  // --- color picker ---
+  let drawTimer;
+  const scheduleDraw = (immediate) => {
+    window.clearTimeout(drawTimer);
+    if (immediate) {
+      drawFractal();
+    } else {
+      drawTimer = window.setTimeout(drawFractal, 90);
+    }
+  };
 
-  $('#js_branch_color').colorpicker({
-    color: Settings.branchColor
-  }).on('hidePicker', function () {
-    Settings.branchColor = $(this).data('colorpicker').color.toHex();
+  Object.entries(settingNames).forEach(([id, setting]) => {
+    const input = document.getElementById(id);
+    const output = document.querySelector(`[data-value-for="${id}"]`);
+
+    const update = (immediate) => {
+      Settings[setting] = Number(input.value);
+      output.value = setting === 'strutFactor'
+        ? Settings[setting].toFixed(2)
+        : setting === 'lineWeight'
+          ? Settings[setting].toFixed(1)
+          : String(Settings[setting]);
+      scheduleDraw(immediate);
+    };
+
+    input.addEventListener('input', () => update(false));
+    input.addEventListener('change', () => update(true));
   });
 
-  // --- slider ---
+  document.querySelectorAll('[data-palette]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const palette = palettes[button.dataset.palette];
+      if (!palette) return;
 
-  $('#js_nest').slider({
-    min: 1, max: 7, step: 1,
-    value: Settings.nest
-  }).on('slideStop', function () {
-    Settings.nest = $(this).data('slider').getValue();
+      Settings.backgroundColor = palette.background;
+      Settings.branchColor = palette.ink;
+
+      document.querySelectorAll('[data-palette]').forEach((option) => {
+        const selected = option === button;
+        option.classList.toggle('is-selected', selected);
+        option.setAttribute('aria-pressed', String(selected));
+      });
+
+      drawFractal();
+    });
   });
 
-  $('#js_radius').slider({
-    min: 100, max: 500, step: 10,
-    value: Settings.radius
-  }).on('slideStop', function () {
-    Settings.radius = $(this).data('slider').getValue();
-  });
-
-  $('#js_strutFactor').slider({
-    min: -0.5, max: 0.5, step: 0.01,
-    value: Settings.strutFactor
-  }).on('slideStop', function () {
-    Settings.strutFactor = $(this).data('slider').getValue();
-  });
-
-  $('#js_strutTarget').slider({
-    min: 1, max: 10, step: 1,
-    value: Settings.strutTarget
-  }).on('slideStop', function () {
-    Settings.strutTarget = $(this).data('slider').getValue();
-  });
-
-  $('#js_subStrutTarget').slider({
-    min: 1, max: 10, step: 1,
-    value: Settings.subStrutTarget
-  }).on('slideStop', function () {
-    Settings.subStrutTarget = $(this).data('slider').getValue();
-  });
-
-  $('#js_numSides').slider({
-    min: 1, max: 10, step: 1,
-    value: Settings.numSides
-  }).on('slideStop', function () {
-    Settings.numSides = $(this).data('slider').getValue();
-  });
-
+  document.getElementById('save-artwork').addEventListener('click', saveArtwork);
 });
